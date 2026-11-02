@@ -22,3 +22,10 @@ VMware/
 *.ovf
 *.key
 *.pem
+
+# NMS Monitor
+/nms-monitor/config.yaml
+/nms-monitor/config_routers.yaml
+/nms-monitor/state.json
+/nms-monitor/*.jsonl
+/nms-monitor/*.lock

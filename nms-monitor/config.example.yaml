@@ -1,0 +1,82 @@
+﻿interval: 10              # giÃ¢y giá»¯a má»—i láº§n kiá»ƒm tra
+
+# Interface cáº§n theo dÃµi trÃªn mÃ¡y nÃ y.
+# [] = tá»± Ä‘á»™ng theo dÃµi cÃ¡c interface Ä‘ang UP lÃºc khá»Ÿi Ä‘á»™ng.
+# Hoáº·c ghi tÃªn cá»¥ thá»ƒ, vÃ­ dá»¥: ["Wi-Fi", "Ethernet"]
+interfaces: []
+
+# CÃ¡c Ä‘á»‹a chá»‰ Ä‘Æ°á»£c ping Ä‘á»ƒ kiá»ƒm tra káº¿t ná»‘i máº¡ng
+targets:
+  - {name: Google DNS, host: 8.8.8.8}
+  - {name: Cloudflare, host: 1.1.1.1}
+
+thresholds:
+  cpu: 80                 # %
+  ram: 85                 # %
+  temp: 70                # Â°C (Windows thÆ°á»ng khÃ´ng cÃ³ cáº£m biáº¿n -> tá»± bá» qua)
+
+notify:
+  telegram:
+    enabled: true        # Ä‘á»•i thÃ nh true sau khi Ä‘iá»n token vÃ  chat_id
+    token: "REPLACE_ME"
+    chat_id: "REPLACE_ME"
+  slack:
+    enabled: false
+    webhook: "REPLACE_ME"
+
+# TÃ¹y chá»n: thiáº¿t bá»‹ máº¡ng tháº­t qua SNMP (router, switch, mÃ¡y Linux cÃ³ snmpd).
+# Äá»ƒ trá»‘ng náº¿u chÆ°a cÃ³ thiáº¿t bá»‹. Muá»‘n thá»­ vá»›i router giáº£ láº­p: xem config_routers.yaml
+# ThÃªm `port: 161` náº¿u thiáº¿t bá»‹ dÃ¹ng cá»•ng SNMP khÃ¡c (máº·c Ä‘á»‹nh 161).
+
+devices:
+  - name: R1
+    ip: 192.168.10.11
+    snmp_community: "REPLACE_ME"
+    interfaces: [1, 2, 3]
+
+  - name: R2
+    ip: 192.168.10.12
+    snmp_community: "REPLACE_ME"
+    interfaces: [1, 2, 3]
+
+  - name: R3
+    ip: 192.168.10.13
+    snmp_community: "REPLACE_ME"
+    interfaces: [1, 2, 3]
+
+  - name: Ubuntu-VM
+    ip: 192.168.10.128
+    snmp_community: "REPLACE_ME"
+    interfaces: [2, 3]
+
+# Chá»‰ giÃ¡m sÃ¡t dá»‹ch vá»¥ cá»§a mÃ¡y/há»‡ thá»‘ng báº¡n quáº£n lÃ½.
+
+services:
+  http:
+    - name: NMS-Dashboard-HTTP
+      url: http://127.0.0.1:5055/
+      expected_status: 200
+      max_response_seconds: 3
+      timeout: 6
+
+    - name: Ubuntu-HTTP
+      url: http://192.168.10.128/
+      expected_status: 200
+      max_response_seconds: 3
+      timeout: 6
+
+  tcp:
+    - name: NMS-Dashboard-TCP
+      host: 127.0.0.1
+      port: 5055
+      timeout: 2
+
+    - name: Ubuntu-SSH
+      host: 192.168.10.128
+      port: 22
+      timeout: 2
+
+    - name: Ubuntu-HTTP-Port
+      host: 192.168.10.128
+      port: 80
+      timeout: 2
